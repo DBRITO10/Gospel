@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Versículo Motivacional do Dia</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e0f2f1, #ffffff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    #versiculo-box {
+      background: #ffffffcc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      max-width: 600px;
+      margin: auto;
+    }
+    #texto {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    #referencia {
+      font-size: 1.2em;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    #explicacao {
+      font-style: italic;
+      color: #333;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="versiculo-box">
+    <div id="texto"></div>
+    <div id="referencia"></div>
+    <div id="explicacao"></div>
+    <button onclick="mostrarNovoVersiculo()">Novo Versículo</button>
+  </div>
+  <script src="versiculos.js"></script>
+  <script>
+    let indiceAtual = -1;
+    function mostrarNovoVersiculo() {
+      let novoIndice;
+      do {
+        novoIndice = Math.floor(Math.random() * versiculos.length);
+      } while (novoIndice === indiceAtual);
+      indiceAtual = novoIndice;
+      const versiculo = versiculos[indiceAtual];
+      document.getElementById("texto").innerText = versiculo.texto;
+      document.getElementById("referencia").innerText = versiculo.referencia;
+      document.getElementById("explicacao").innerText = versiculo.explicacao;
+    }
+    mostrarNovoVersiculo();
+  </script>
+</body>
+</html>
