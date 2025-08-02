@@ -88,6 +88,7 @@
       <button onclick="compartilharVersiculo()">📤 Compartilhar</button>
       <button onclick="falarVersiculo()">🔊 Ouvir</button>
       <button onclick="marcarFavorito()" id="botaoFavorito">⭐ Favoritar</button>
+      <button onclick="verFavoritos()">⭐ Ver Favoritos</button>
     </div>
 
     <footer>&copy; Palavra Viva de Deus</footer>
@@ -105,7 +106,8 @@
 
     let versiculosFiltrados = [...versiculos];
     let indiceAtual = 0;
-    const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
+    let modoFavoritos = false;
+    let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
 
     const temasUnicos = [...new Set(versiculos.map(v => v.tema))];
     temasUnicos.forEach(t => {
@@ -128,7 +130,11 @@
     }
 
     function novoVersiculo() {
-      if (versiculosFiltrados.length <= 1) return;
+      if (versiculosFiltrados.length === 0) return;
+      if (versiculosFiltrados.length === 1) {
+        mostrarVersiculo(0);
+        return;
+      }
       let novoIndice;
       do {
         novoIndice = Math.floor(Math.random() * versiculosFiltrados.length);
@@ -201,8 +207,7 @@
       for (let i = 0; i < words.length; i++) {
         const testLine = line + words[i] + ' ';
         const metrics = ctx.measureText(testLine);
-        const testWidth = metrics.width;
-        if (testWidth > maxWidth && i > 0) {
+        if (metrics.width > maxWidth && i > 0) {
           ctx.fillText(line, x, y);
           line = words[i] + ' ';
           y += lineHeight;
@@ -232,8 +237,15 @@
     }
 
     function filtrarPorTema() {
+      modoFavoritos = false;
       const tema = temaSelect.value;
       versiculosFiltrados = tema ? versiculos.filter(v => v.tema === tema) : [...versiculos];
+      mostrarVersiculo(0);
+    }
+
+    function verFavoritos() {
+      modoFavoritos = true;
+      versiculosFiltrados = versiculos.filter(v => favoritos.includes(v.texto));
       mostrarVersiculo(0);
     }
 
