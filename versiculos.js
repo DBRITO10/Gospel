@@ -120,6 +120,9 @@ const versiculos = [
     explicacao: "Reconheça que você pertence a Deus. Ele cuida de você.",
     tema: "Identidade"
   },
+
+  // Abaixo os versículos de Apocalipse e os 20 novos adicionados anteriormente
+
   {
     texto: "E Deus limpará de seus olhos toda lágrima.",
     referencia: "📖 Apocalipse 21:4",
@@ -179,60 +182,6 @@ const versiculos = [
     referencia: "📖 Apocalipse 12:11",
     explicacao: "A vitória é sua por meio de Jesus e pela fé que você vive.",
     tema: "Vitória"
-  },
-  {
-    texto: "E o mar já não existia.",
-    referencia: "📖 Apocalipse 21:1",
-    explicacao: "Deus fará novas todas as coisas, inclusive a criação. Um novo começo está por vir.",
-    tema: "Renovação"
-  },
-  {
-    texto: "E ele enxugará dos olhos toda lágrima; e não haverá mais morte, nem pranto, nem clamor, nem dor.",
-    referencia: "📖 Apocalipse 21:4",
-    explicacao: "A promessa de um futuro sem sofrimento traz consolo para hoje.",
-    tema: "Esperança"
-  },
-  {
-    texto: "O Senhor Deus lhes dará luz, e reinarão pelos séculos dos séculos.",
-    referencia: "📖 Apocalipse 22:5",
-    explicacao: "A luz de Deus nunca se apaga. Com Ele, reinamos para sempre.",
-    tema: "Eternidade"
-  },
-  {
-    texto: "E cantavam um cântico novo diante do trono.",
-    referencia: "📖 Apocalipse 14:3",
-    explicacao: "Deus sempre traz novos motivos para louvar. Cante ao Senhor com alegria!",
-    tema: "Adoração"
-  },
-  {
-    texto: "E abriram-se os livros; e outro livro foi aberto, que é o da vida.",
-    referencia: "📖 Apocalipse 20:12",
-    explicacao: "Deus vê e registra todas as coisas. Viva com fé e amor, pois seu nome está em Suas mãos.",
-    tema: "Juízo"
-  },
-  {
-    texto: "Bem-aventurado aquele que lê e ouve as palavras desta profecia.",
-    referencia: "📖 Apocalipse 1:3",
-    explicacao: "Ler a Palavra de Deus é ser abençoado com sabedoria e esperança.",
-    tema: "Palavra"
-  },
-  {
-    texto: "Santo, santo, santo é o Senhor Deus, o Todo-Poderoso.",
-    referencia: "📖 Apocalipse 4:8",
-    explicacao: "A santidade de Deus é eterna. Adore Aquele que reina para sempre.",
-    tema: "Santidade"
-  },
-  {
-    texto: "E Deus enxugará de seus olhos toda lágrima; não haverá mais morte.",
-    referencia: "📖 Apocalipse 7:17",
-    explicacao: "Deus é consolo em tempos difíceis e esperança para a eternidade.",
-    tema: "Consolo"
-  },
-  {
-    texto: "Não temas das coisas que hás de padecer.",
-    referencia: "📖 Apocalipse 2:10",
-    explicacao: "A fidelidade em tempos difíceis será recompensada com vida eterna.",
-    tema: "Coragem"
   },
   {
     texto: "E vi um novo céu e uma nova terra.",
