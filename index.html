@@ -134,8 +134,157 @@
   <canvas id="canvas" width="1080" height="1080"></canvas>
   <script src="versiculos.js"></script>
   <script>
-    // (mesmo script que você já usa, sem alterações)
-  </script>
+    const versiculoEl = document.getElementById('texto');
+    const referenciaEl = document.getElementById('referencia');
+    const explicacaoEl = document.getElementById('explicacao');
+    const temaSelect = document.getElementById('temaSelect');
+    const botaoFavorito = document.getElementById('botaoFavorito');
 
+    let versiculosFiltrados = [...versiculos];
+    let indiceAtual = 0;
+    let modoFavoritos = false;
+    let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
+
+    const temasUnicos = [...new Set(versiculos.map(v => v.tema))];
+    temasUnicos.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      temaSelect.appendChild(opt);
+    });
+
+    function mostrarVersiculo(index) {
+      const v = versiculosFiltrados[index];
+      if (!v) return;
+      versiculoEl.textContent = `"${v.texto}"`;
+      referenciaEl.textContent = `📖 ${v.referencia}`;
+      explicacaoEl.textContent = v.explicacao;
+      indiceAtual = index;
+      botaoFavorito.classList.toggle('favorito', favoritos.includes(v.texto));
+    }
+
+    function novoVersiculo() {
+      if (versiculosFiltrados.length === 0) return;
+      if (versiculosFiltrados.length === 1) {
+        mostrarVersiculo(0);
+        return;
+      }
+      let novoIndice;
+      do {
+        novoIndice = Math.floor(Math.random() * versiculosFiltrados.length);
+      } while (novoIndice === indiceAtual);
+      mostrarVersiculo(novoIndice);
+    }
+
+    function copiarVersiculo() {
+      const texto = `${versiculoEl.textContent}\n${referenciaEl.textContent}\n${explicacaoEl.textContent}`;
+      navigator.clipboard.writeText(texto).then(() => alert("📋 Copiado!"));
+    }
+
+    function compartilharVersiculo() {
+      const v = versiculosFiltrados[indiceAtual];
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1080&q=80';
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 6;
+
+        ctx.font = "bold 60px Segoe UI";
+        ctx.fillText("Versículo Motivacional", canvas.width / 2, 120);
+
+        ctx.font = "40px Segoe UI";
+        wrapText(ctx, `"${v.texto}"`, canvas.width / 2, 220, 900, 50);
+
+        ctx.font = "bold 36px Segoe UI";
+        ctx.fillText(`${v.referencia}`, canvas.width / 2, 460);
+
+        ctx.font = "italic 34px Segoe UI";
+        wrapText(ctx, v.explicacao, canvas.width / 2, 520, 900, 45);
+
+        ctx.font = "22px Segoe UI";
+        ctx.fillStyle = "#dddddd";
+        ctx.fillText("© Palavra Viva de Deus", canvas.width / 2, 1050);
+
+        canvas.toBlob(blob => {
+          const file = new File([blob], "versiculo.png", { type: "image/png" });
+          if (navigator.canShare?.({ files: [file] })) {
+            navigator.share({
+              files: [file],
+              title: 'Versículo do Dia',
+              text: `${v.texto} - ${v.referencia}`
+            }).catch(err => alert("Erro ao compartilhar: " + err));
+          } else {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "versiculo.png";
+            link.click();
+            URL.revokeObjectURL(link.href);
+          }
+        }, "image/png");
+      };
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line, x, y);
+          line = words[i] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+
+    function falarVersiculo() {
+      const msg = new SpeechSynthesisUtterance(`${versiculoEl.textContent} - ${referenciaEl.textContent}. ${explicacaoEl.textContent}`);
+      msg.lang = 'pt-BR';
+      speechSynthesis.speak(msg);
+    }
+
+    function marcarFavorito() {
+      const texto = versiculosFiltrados[indiceAtual].texto;
+      const index = favoritos.indexOf(texto);
+      if (index >= 0) {
+        favoritos.splice(index, 1);
+      } else {
+        favoritos.push(texto);
+      }
+      localStorage.setItem('favoritos', JSON.stringify(favoritos));
+      botaoFavorito.classList.toggle('favorito', favoritos.includes(texto));
+    }
+
+    function filtrarPorTema() {
+      modoFavoritos = false;
+      const tema = temaSelect.value;
+      versiculosFiltrados = tema ? versiculos.filter(v => v.tema === tema) : [...versiculos];
+      mostrarVersiculo(0);
+    }
+
+    function verFavoritos() {
+      modoFavoritos = true;
+      versiculosFiltrados = versiculos.filter(v => favoritos.includes(v.texto));
+      mostrarVersiculo(0);
+    }
+
+    // Início automático
+    mostrarVersiculo(Math.floor(Math.random() * versiculosFiltrados.length));
+  </script>
 </body>
 </html>
