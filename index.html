@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Versículo Motivacional</title>
+  <title>Versículo Motivacional do Dia</title>
   <style>
     body {
       margin: 0;
@@ -16,23 +16,23 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       padding: 1rem;
     }
     .container {
       background: rgba(0, 0, 0, 0.75);
       border-radius: 15px;
       padding: 2rem;
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       box-shadow: 0 0 20px rgba(255,255,255,0.2);
     }
     h1 {
-      font-size: 1.8rem;
+      font-size: 2rem;
       margin-bottom: 1rem;
     }
     .versiculo {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       margin: 1rem 0;
     }
     .referencia {
@@ -44,9 +44,9 @@
       font-style: italic;
       margin-bottom: 1.5rem;
     }
-    .botoes button {
+    .botoes button, select {
       margin: 0.4rem;
-      padding: 0.6rem 1rem;
+      padding: 0.8rem 1.2rem;
       border: none;
       border-radius: 10px;
       background-color: #00aaff;
@@ -54,18 +54,12 @@
       font-weight: bold;
       cursor: pointer;
     }
-    .botoes button:hover {
+    .botoes button:hover, select:hover {
       background-color: #0077cc;
     }
-    .favoritar {
+    .favorito {
       background-color: gold;
       color: black;
-    }
-    select {
-      margin-bottom: 1rem;
-      padding: 0.4rem;
-      border-radius: 10px;
-      font-size: 1rem;
     }
     footer {
       margin-top: 2rem;
@@ -80,27 +74,20 @@
 <body>
 
   <div class="container">
-    <h1>Versículo Motivacional</h1>
-
-    <select id="filtroCategoria" onchange="filtrarPorCategoria()">
-      <option value="">Todas as Categorias</option>
-      <option value="fé">Fé</option>
-      <option value="esperança">Esperança</option>
-      <option value="força">Força</option>
-      <option value="gratidão">Gratidão</option>
-    </select>
-
+    <h1>Versículo Motivacional do Dia</h1>
     <div class="versiculo" id="texto"></div>
     <div class="referencia" id="referencia"></div>
     <div class="explicacao" id="explicacao"></div>
 
     <div class="botoes">
+      <select id="temaSelect" onchange="filtrarPorTema()">
+        <option value="">🎯 Todos os Temas</option>
+      </select>
+      <button onclick="novoVersiculo()">🔄 Novo</button>
       <button onclick="copiarVersiculo()">📋 Copiar</button>
       <button onclick="compartilharVersiculo()">📤 Compartilhar</button>
-      <button onclick="novoVersiculo()">🔄 Novo</button>
-      <button onclick="lerVersiculo()">🔊 Ouvir</button>
-      <button class="favoritar" onclick="favoritarVersiculo()">⭐ Favoritar</button>
-      <button onclick="mostrarFavoritos()">📚 Ver Favoritos</button>
+      <button onclick="falarVersiculo()">🔊 Ouvir</button>
+      <button onclick="marcarFavorito()" id="botaoFavorito">⭐ Favoritar</button>
     </div>
 
     <footer>&copy; Palavra Viva de Deus</footer>
@@ -113,70 +100,96 @@
     const versiculoEl = document.getElementById('texto');
     const referenciaEl = document.getElementById('referencia');
     const explicacaoEl = document.getElementById('explicacao');
+    const temaSelect = document.getElementById('temaSelect');
+    const botaoFavorito = document.getElementById('botaoFavorito');
+
+    let versiculosFiltrados = [...versiculos];
     let indiceAtual = 0;
-    let versiculosFiltrados = versiculos;
+    const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
+
+    const temasUnicos = [...new Set(versiculos.map(v => v.tema))];
+    temasUnicos.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      temaSelect.appendChild(opt);
+    });
 
     function mostrarVersiculo(index) {
       const v = versiculosFiltrados[index];
+      if (!v) return;
+
       versiculoEl.textContent = `"${v.texto}"`;
-      referenciaEl.textContent = `📖 ${v.referencia}`;
+      referenciaEl.textContent = v.referencia;
       explicacaoEl.textContent = v.explicacao;
+
+      indiceAtual = index;
+      botaoFavorito.classList.toggle('favorito', favoritos.includes(v.texto));
     }
 
     function novoVersiculo() {
+      if (versiculosFiltrados.length <= 1) return;
       let novoIndice;
       do {
         novoIndice = Math.floor(Math.random() * versiculosFiltrados.length);
       } while (novoIndice === indiceAtual);
-      indiceAtual = novoIndice;
-      mostrarVersiculo(indiceAtual);
+      mostrarVersiculo(novoIndice);
     }
 
     function copiarVersiculo() {
       const texto = `${versiculoEl.textContent}\n${referenciaEl.textContent}\n${explicacaoEl.textContent}`;
-      navigator.clipboard.writeText(texto).then(() => alert("📋 Versículo copiado!"));
+      navigator.clipboard.writeText(texto).then(() => alert("📋 Copiado!"));
     }
 
     function compartilharVersiculo() {
       const v = versiculosFiltrados[indiceAtual];
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
-      const background = new Image();
-      background.crossOrigin = "anonymous";
-      background.src = 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1080&q=80';
 
-      background.onload = () => {
-        ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=1080&q=80';
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
         ctx.shadowColor = "black";
         ctx.shadowBlur = 6;
+
         ctx.font = "bold 60px Segoe UI";
-        ctx.fillText("Versículo Motivacional", canvas.width / 2, 140);
+        ctx.fillText("Versículo Motivacional", canvas.width / 2, 120);
+
         ctx.font = "40px Segoe UI";
-        wrapText(ctx, `\"${v.texto}\"`, canvas.width / 2, 240, 900, 50);
+        wrapText(ctx, `"${v.texto}"`, canvas.width / 2, 220, 900, 50);
+
         ctx.font = "bold 36px Segoe UI";
-        ctx.fillText(`📖 ${v.referencia}`, canvas.width / 2, 450);
+        ctx.fillText(`${v.referencia}`, canvas.width / 2, 460);
+
         ctx.font = "italic 34px Segoe UI";
-        wrapText(ctx, v.explicacao, canvas.width / 2, 510, 900, 45);
+        wrapText(ctx, v.explicacao, canvas.width / 2, 520, 900, 45);
+
         ctx.font = "22px Segoe UI";
         ctx.fillStyle = "#dddddd";
-        ctx.fillText("© Palavra Viva de Deus", canvas.width / 2, 1040);
+        ctx.fillText("© Palavra Viva de Deus", canvas.width / 2, 1050);
 
-        canvas.toBlob((blob) => {
+        canvas.toBlob(blob => {
           const file = new File([blob], "versiculo.png", { type: "image/png" });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            navigator.share({ files: [file], title: 'Versículo do Dia', text: `\"${v.texto}\" - ${v.referencia}` })
-              .catch(err => alert("Erro ao compartilhar: " + err));
+          if (navigator.canShare?.({ files: [file] })) {
+            navigator.share({
+              files: [file],
+              title: 'Versículo do Dia',
+              text: `${v.texto} - ${v.referencia}`
+            }).catch(err => alert("Erro ao compartilhar: " + err));
           } else {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "versiculo.png";
-            a.click();
-            URL.revokeObjectURL(url);
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "versiculo.png";
+            link.click();
+            URL.revokeObjectURL(link.href);
           }
         }, "image/png");
       };
@@ -200,40 +213,33 @@
       ctx.fillText(line, x, y);
     }
 
-    function favoritarVersiculo() {
-      const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
-      const atual = versiculosFiltrados[indiceAtual];
-      favoritos.push(atual);
-      localStorage.setItem('favoritos', JSON.stringify(favoritos));
-      alert("⭐ Versículo favoritado!");
+    function falarVersiculo() {
+      const msg = new SpeechSynthesisUtterance(`${versiculoEl.textContent} - ${referenciaEl.textContent}. ${explicacaoEl.textContent}`);
+      msg.lang = 'pt-BR';
+      speechSynthesis.speak(msg);
     }
 
-    function mostrarFavoritos() {
-      const favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]');
-      if (favoritos.length === 0) {
-        alert("Nenhum versículo favoritado ainda.");
-        return;
+    function marcarFavorito() {
+      const texto = versiculosFiltrados[indiceAtual].texto;
+      const index = favoritos.indexOf(texto);
+      if (index >= 0) {
+        favoritos.splice(index, 1);
+      } else {
+        favoritos.push(texto);
       }
-      versiculosFiltrados = favoritos;
-      indiceAtual = 0;
-      mostrarVersiculo(indiceAtual);
+      localStorage.setItem('favoritos', JSON.stringify(favoritos));
+      botaoFavorito.classList.toggle('favorito', favoritos.includes(texto));
     }
 
-    function lerVersiculo() {
-      const texto = `${versiculoEl.textContent}. ${explicacaoEl.textContent}`;
-      const utterance = new SpeechSynthesisUtterance(texto);
-      utterance.lang = 'pt-BR';
-      speechSynthesis.speak(utterance);
+    function filtrarPorTema() {
+      const tema = temaSelect.value;
+      versiculosFiltrados = tema ? versiculos.filter(v => v.tema === tema) : [...versiculos];
+      mostrarVersiculo(0);
     }
 
-    function filtrarPorCategoria() {
-      const categoria = document.getElementById('filtroCategoria').value;
-      versiculosFiltrados = categoria ? versiculos.filter(v => v.tema === categoria) : versiculos;
-      indiceAtual = 0;
-      mostrarVersiculo(indiceAtual);
-    }
-
-    mostrarVersiculo(indiceAtual);
+    // Início
+    mostrarVersiculo(Math.floor(Math.random() * versiculosFiltrados.length));
   </script>
+
 </body>
 </html>
